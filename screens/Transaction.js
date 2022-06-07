@@ -1,16 +1,27 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  ImageBackground,
+  Image
+} from "react-native";
 import * as Permissions from "expo-permissions";
 import { BarCodeScanner } from "expo-barcode-scanner";
+
+
 
 export default class TransactionScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      bookId: "",
+      studentId: "",
       domState: "normal",
       hasCameraPermissions: null,
-      scanned: false,
-      scannedData: ""
+      scanned: false
     };
   }
 
@@ -28,16 +39,26 @@ export default class TransactionScreen extends Component {
   };
 
   handleBarCodeScanned = async ({ type, data }) => {
-    this.setState({
-      scannedData: data,
-      domState: "normal",
-      scanned: true
-    });
+    const { domState } = this.state;
+
+    if (domState === "bookId") {
+      this.setState({
+        bookId: data,
+        domState: "normal",
+        scanned: true
+      });
+    } else if (domState === "studentId") {
+      this.setState({
+        studentId: data,
+        domState: "normal",
+        scanned: true
+      });
+    }
   };
 
   render() {
-    const { domState, hasCameraPermissions, scannedData, scanned } = this.state;
-    if (domState === "scanner") {
+    const { bookId, studentId, domState, scanned } = this.state;
+    if (domState !== "normal") {
       return (
         <BarCodeScanner
           onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
@@ -45,18 +66,9 @@ export default class TransactionScreen extends Component {
         />
       );
     }
-
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>
-          {hasCameraPermissions ? scannedData : "Request for Camera Permission"}
-        </Text>
-        <TouchableOpacity
-          style={[styles.button, { marginTop: 25 }]}
-          onPress={() => this.getCameraPermissions("scanner")}
-        >
-          <Text style={styles.buttonText}>Scan QR Code</Text>
-        </TouchableOpacity>
+        
       </View>
     );
   }
@@ -65,24 +77,64 @@ export default class TransactionScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#FFFFFF"
+  },
+  bgImage: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "center"
+  },
+  upperContainer: {
+    flex: 0.5,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#5653D4"
+    alignItems: "center"
   },
-  text: {
-    color: "#ffff",
-    fontSize: 15
+  appIcon: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain",
+    marginTop: 80
   },
-  button: {
-    width: "43%",
-    height: 55,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F48D20",
-    borderRadius: 15
+  appName: {
+    width: 80,
+    height: 80,
+    resizeMode: "contain"
   },
-  buttonText: {
-    fontSize: 24,
+  lowerContainer: {
+    flex: 0.5,
+    alignItems: "center"
+  },
+  textinputContainer: {
+    borderWidth: 2,
+    borderRadius: 10,
+    flexDirection: "row",
+    backgroundColor: "#9DFD24",
+    borderColor: "#FFFFFF"
+  },
+  textinput: {
+    width: "57%",
+    height: 50,
+    padding: 10,
+    borderColor: "#FFFFFF",
+    borderRadius: 10,
+    borderWidth: 3,
+    fontSize: 18,
+    backgroundColor: "#5653D4",
+    fontFamily: "Rajdhani_600SemiBold",
     color: "#FFFFFF"
+  },
+  scanbutton: {
+    width: 100,
+    height: 50,
+    backgroundColor: "#9DFD24",
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  scanbuttonText: {
+    fontSize: 24,
+    color: "#0A0101",
+    fontFamily: "Rajdhani_600SemiBold"
   }
 });
